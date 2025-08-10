@@ -57,6 +57,30 @@ def search_google(item_to_find: str):
     ]
     return raw_results 
 
+
+import requests
+
+def wikipedia_lookup(query):
+    # Step 1: Search
+    search_url = "https://en.wikipedia.org/w/rest.php/v1/search/title"
+    params = {"q": query, "limit": 1}
+    search_resp = requests.get(search_url, params=params)
+    search_resp.raise_for_status()
+    search_data = search_resp.json()
+    
+    if not search_data.get("pages"):
+        return f"No Wikipedia page found for '{query}'"
+    
+    page_key = search_data["pages"][0]["key"]
+    
+    # Step 2: Fetch summary
+    summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{page_key}"
+    summary_resp = requests.get(summary_url)
+    summary_resp.raise_for_status()
+    return summary_resp.json().get("extract")
+
+# Example: LLM decides query should be "United States Constitution"
+print(wikipedia_lookup("jeans"))
 # @function_tool
 # def get_weather(city: str) -> str:
 #      """returns weather info for the specified city."""
@@ -78,10 +102,8 @@ def search_google(item_to_find: str):
 # )
 
 
-if __name__ == "__main__":
-    item_to_find = "mediterranean houses in the 16h century"
-    results = search_google(item_to_find)
-    desc = describe_all_images(results)
-    print(desc[0])
-    # for result in results:
-    #     print(f"Title: {result['title']}, Link: {result['link']}")
+# if __name__ == "__main__":
+#     item_to_find = "mediterranean houses in the 16h century"
+#     results = search_google(item_to_find)
+#     desc = describe_all_images(results)
+#     print(desc[0])
