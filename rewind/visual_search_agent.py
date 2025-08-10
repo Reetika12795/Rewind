@@ -122,7 +122,7 @@ agent = Agent(
 
 async def main():
     # result = await Runner.run(agent, "women dressing in the 16th century in south of France")
-    result = await Runner.run(agent, "fishing boaths in the 16th century in south of France")
+    result = await Runner.run(agent, "fishing boats in the 16th century in south of France")
     print(result.final_output)
 
 if __name__ == "__main__":
