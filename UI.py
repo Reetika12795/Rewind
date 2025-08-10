@@ -28,7 +28,7 @@ def generate_image(input_image, location, year):
 
 # Use gr.Blocks() for more control over the layout of the components.
 with gr.Blocks() as demo:
-    gr.Markdown("# Image Generation Project")
+    gr.Markdown("# Rewind Project")
     gr.Markdown("Upload an image, enter a location and year, then click Generate.")
     
     with gr.Row():
