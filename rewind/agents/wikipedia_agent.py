@@ -47,6 +47,7 @@ class WikipediaResearchAgent:
         
         analysis = response.choices[0].message.content
         
+        print('Analysis:', analysis)
         return {
             "year": str(year),
             "location": location,

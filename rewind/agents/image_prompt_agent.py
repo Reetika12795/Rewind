@@ -33,7 +33,7 @@ class ImagePromptAgent:
             input_image: PIL Image object to be analyzed and edited
             
         Returns:
-            String containing the generated image editing prompt
+            String containing a image editing prompt
         
         Raises:
             ValueError: If input_image is None or invalid
@@ -50,13 +50,13 @@ class ImagePromptAgent:
             2. Suggest specific style transformations based on the historical context
             Keep final prompt under 60 words."""
             
-            user_prompt = f"""Step 1 - Analyze this image: {img_str}
+            user_prompt = f"""Step 1 - Analyze this image and its elements: {img_str}
             
             Step 2 - Based on the analysis above, create a transformation prompt using:
             - Historical Context: {art_context['art_context']}
             - Location/Year: {art_context['location']}, {art_context['year']}
             
-            Keep the core elements of the original image while applying period-appropriate style."""
+             Image how those elements of the original image existed or looked different based on the information while applying period-appropriate style."""
             
             response = self.client.chat.completions.create(
                 model="gpt-4.1-mini",  # More reliable for image analysis

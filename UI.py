@@ -2,6 +2,7 @@ import gradio as gr
 from PIL import Image
 from rewind.agents.wikipedia_agent import WikipediaResearchAgent
 from rewind.agents.image_prompt_agent import ImagePromptAgent
+from rewind.agents.image_modification_agent import ImageModificationAgent
 
 
 def __init__():
@@ -10,9 +11,10 @@ def __init__():
     This function sets up the UI components and their interactions.
     """
     # Initialize agents
-    global wiki_agent, prompt_agent
+    global wiki_agent, prompt_agent, modification_agent
     wiki_agent = WikipediaResearchAgent()
     prompt_agent = ImagePromptAgent()
+    modification_agent = ImageModificationAgent()
     print("Agents initialized successfully.")
     global image_input, location_input, year_input
     image_input = None
@@ -35,25 +37,33 @@ def generate_image(input_image, location, year):
     Returns:
         PIL.Image.Image: The processed image to be displayed as output.
     """
-    # logging
-    print(f"Location: {location}, Year: {year}")
-
-    if input_image is None:
-        # Create a blank image if no input is provided to avoid errors.
-        return Image.new('RGB', (512, 512), color = 'lightgray')
-        
-    # alright, magic starts here:
     try:
+        print(f"Starting image generation for {location}, {year}")
+        
         # Get historical art context
         art_context = wiki_agent.research_art_context(int(year), location)
+        print(f"Art context retrieved: {art_context}")
 
-        # Generate image editing prompt using the actual input_image
+        # Generate image editing prompt
         editing_prompt = prompt_agent.generate_image_prompt(art_context, input_image)
         print(f"Generated Editing Prompt: {editing_prompt}")
 
-        return input_image
+        # Modify the image using DALL-E
+        modified_image = modification_agent.modify_image(input_image, editing_prompt)
+        
+        # Verify we got a different image back
+        if modified_image is not None and isinstance(modified_image, Image.Image):
+            print(f"Modified image size: {modified_image.size}")
+            print(f"Original image size: {input_image.size}")
+            return modified_image
+        else:
+            print("Warning: No valid modified image returned")
+            return input_image
+            
     except Exception as e:
         print(f"Error during image generation: {e}")
+        import traceback
+        print(traceback.format_exc())
         return input_image
 
 # Use gr.Blocks() for more control over the layout of the components.
