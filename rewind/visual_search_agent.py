@@ -3,9 +3,40 @@
 from serpapi.google_search import GoogleSearch
 from dotenv import load_dotenv
 import os
+from openai import OpenAI
 
 load_dotenv()
 SERP_API_KEY = os.getenv("SERP_API_KEY")
+openai_client = OpenAI()
+
+def describe_all_images(images_results):
+    descriptions = []
+    for image in images_results:
+        description = describe_thumbnail(image["thumbnail"])
+        descriptions.append({
+            "title": image["title"],
+            "link": image["link"],
+            "description": description
+        })
+        break
+    return descriptions
+
+def describe_thumbnail(image_url):
+    response = openai_client.responses.create(
+        model="gpt-4.1",
+        input=[{
+            "role": "user",
+            "content": [
+                {"type": "input_text", "text": "what's in this image? To what era/year does it belong?"},
+                {
+                    "type": "input_image",
+                    "image_url": image_url,
+                },
+            ],
+        }],
+    )
+    return response.output_text + "\n"
+
 
 def search_google(item_to_find: str):
     params = {
@@ -16,7 +47,6 @@ def search_google(item_to_find: str):
 
     search = GoogleSearch(params)
     raw_results = search.get_dict()["images_results"]
-    print(raw_results)
     images_results = [
         {
             "thumbnail": result["thumbnail"],
@@ -26,7 +56,6 @@ def search_google(item_to_find: str):
         for result in raw_results
     ]
     return raw_results 
-    # I actully can use the thumbnail here 
 
 # @function_tool
 # def get_weather(city: str) -> str:
@@ -52,5 +81,7 @@ def search_google(item_to_find: str):
 if __name__ == "__main__":
     item_to_find = "mediterranean houses in the 16h century"
     results = search_google(item_to_find)
-    for result in results:
-        print(f"Title: {result['title']}, Link: {result['link']}")
+    desc = describe_all_images(results)
+    print(desc[0])
+    # for result in results:
+    #     print(f"Title: {result['title']}, Link: {result['link']}")
