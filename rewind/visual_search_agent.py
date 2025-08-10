@@ -1,9 +1,15 @@
-# from agents import Agent, ModelSettings, function_tool
-
 from serpapi.google_search import GoogleSearch
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
+import asyncio
+
+
+from agents import (
+    Agent,
+    function_tool,
+    Runner
+)
 
 load_dotenv()
 SERP_API_KEY = os.getenv("SERP_API_KEY")
@@ -79,8 +85,6 @@ def wikipedia_lookup(query):
     summary_resp.raise_for_status()
     return summary_resp.json().get("extract")
 
-# Example: LLM decides query should be "United States Constitution"
-print(wikipedia_lookup("jeans"))
 # @function_tool
 # def get_weather(city: str) -> str:
 #      """returns weather info for the specified city."""
@@ -102,8 +106,23 @@ print(wikipedia_lookup("jeans"))
 # )
 
 
+agent = Agent(
+    name="Math Tutor",
+    instructions="You provide help with math problems. Explain your reasoning at each step and include examples",
+)
+
+
+async def main():
+    result = await Runner.run(agent, "what 2 + 2?")
+    print(result.final_output)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
 # if __name__ == "__main__":
 #     item_to_find = "mediterranean houses in the 16h century"
 #     results = search_google(item_to_find)
 #     desc = describe_all_images(results)
 #     print(desc[0])
+#     # print(wikipedia_lookup("United States Constitution"))
