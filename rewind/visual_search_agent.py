@@ -5,6 +5,8 @@ from openai import OpenAI
 import asyncio
 import requests
 
+from agents import enable_verbose_stdout_logging
+enable_verbose_stdout_logging()
 
 from agents import (
     Agent,
@@ -67,7 +69,7 @@ def search_google(item_to_find: str):
 @function_tool  
 def seach_google_for_images(item_to_find: str) -> list:
     """
-    Search Google Images for a given item and return a list of image results with descriptions.
+    Search Google Images for a given item and return a list of image results, with links and descriptions.
 
     Args:
         item_to_find (str): The item or query to search for in Google Images.
@@ -111,12 +113,16 @@ def wikipedia_lookup(query):
 
 agent = Agent(
     name="Visual Search Agent",
-    instructions="You search for visual cues to illustrate specific items, within a specific time period.",
-    tools=[seach_google_for_images, wikipedia_lookup, WebSearchTool()],
+    instructions="""You search for visual cues to illustrate specific items within a specific time period.
+    You provide a precise description of those items.
+    You can use the tools provided to search for images and look up information on internet et specific images.""",
+    model="o4-mini-2025-04-16",
+    tools=[seach_google_for_images, WebSearchTool()],
 )
 
 async def main():
-    result = await Runner.run(agent, "women dressing in the 16th century in south of France")
+    # result = await Runner.run(agent, "women dressing in the 16th century in south of France")
+    result = await Runner.run(agent, "fishing boaths in the 16th century in south of France")
     print(result.final_output)
 
 if __name__ == "__main__":
