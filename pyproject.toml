@@ -1,0 +1,45 @@
+[project]
+name = "rewind"
+version = "0.1.0"
+description = "AI-powered time travel: Upload a photo, pick a year, see how that place looked in history"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+requires-python = ">=3.13"
+
+dependencies = [
+    # Core UI and web framework
+    "gradio>=4.44.0",
+    
+    # Basic image processing
+    "pillow>=10.1.0",
+    
+    # HTTP requests for APIs
+    "requests>=2.31.0",
+    
+    # Basic utilities
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/rewind"
+Repository = "https://github.com/yourusername/rewind"
+
+[project.scripts]
+rewind = "rewind.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 88
+target-version = ['py313']
