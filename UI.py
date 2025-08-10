@@ -1,5 +1,24 @@
 import gradio as gr
 from PIL import Image
+from rewind.agents.wikipedia_agent import WikipediaResearchAgent
+from rewind.agents.image_prompt_agent import ImagePromptAgent
+
+
+def __init__():
+    """
+    Initialize the Gradio interface for the Rewind project.
+    This function sets up the UI components and their interactions.
+    """
+    # Initialize agents
+    global wiki_agent, prompt_agent
+    wiki_agent = WikipediaResearchAgent()
+    prompt_agent = ImagePromptAgent()
+    print("Agents initialized successfully.")
+    global image_input, location_input, year_input
+    image_input = None
+    location_input = ""
+    year_input = ""
+    print("Global variables initialized.")
 
 # Define the function that will be called when the "Generate" button is clicked.
 # This function takes the user's inputs and returns the output.
@@ -16,15 +35,26 @@ def generate_image(input_image, location, year):
     Returns:
         PIL.Image.Image: The processed image to be displayed as output.
     """
-    # In a real application, you would add your image processing logic here.
-    # For demonstration, we'll just display the original image.
+    # logging
     print(f"Location: {location}, Year: {year}")
-    
+
     if input_image is None:
         # Create a blank image if no input is provided to avoid errors.
         return Image.new('RGB', (512, 512), color = 'lightgray')
         
-    return input_image
+    # alright, magic starts here:
+    try:
+        # Get historical art context
+        art_context = wiki_agent.research_art_context(int(year), location)
+
+        # Generate image editing prompt using the actual input_image
+        editing_prompt = prompt_agent.generate_image_prompt(art_context, input_image)
+        print(f"Generated Editing Prompt: {editing_prompt}")
+
+        return input_image
+    except Exception as e:
+        print(f"Error during image generation: {e}")
+        return input_image
 
 # Use gr.Blocks() for more control over the layout of the components.
 with gr.Blocks() as demo:
@@ -55,5 +85,6 @@ with gr.Blocks() as demo:
 
 # Launch the Gradio interface.
 if __name__ == "__main__":
+    __init__()  # Initialize the agents
     demo.launch()
     print("Gradio interface launched. Visit the provided URL to interact with the app.")
